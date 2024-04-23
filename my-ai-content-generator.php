@@ -36,6 +36,8 @@ $bedrock_runtime = new BedrockRuntimeClient([
 
 /**
  * Function to return instance of BedrockClient.
+ * 
+ * @return BedrockClient
  */
 function my_ai_bedrock_client() {
     global $bedrock;
@@ -44,6 +46,8 @@ function my_ai_bedrock_client() {
 
 /**
  * Function to return instance of BedrockRuntimeClient.
+ * 
+ * @return BedrockRuntimeClient
  */
 function my_ai_bedrock_runtime_client() {
     global $bedrock_runtime;
