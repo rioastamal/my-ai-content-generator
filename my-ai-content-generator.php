@@ -231,3 +231,5 @@ function my_ai_settings_menu() {
         'my_ai_credentials_page',
     );
 }
+
+require __DIR__ . '/my-ai-rest-api.php';
