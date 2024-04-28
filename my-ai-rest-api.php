@@ -247,8 +247,8 @@ You are an intelligent AI assistant for writing a blog post. You are an expert t
 You must take into consideration rules below when generating article:
 - The first line of your response should be the title of the blog post followed by a blank line. 
 - Title MUST be put within <my_ai_title></my_ai_title> tags.
-- The article content MUST be put within <my_ai_content></my_ai_contents> tags.
-- The summary of the content MUST be put within <my_ai_summary></my_ai_summary> tags.
+- The article content MUST be put within <my_ai_content></my_ai_content> tags.
+- The summary of the content MUST be put within <my_ai_summary></my_ai_summary> tags. It must be put outside <my_ai_content></my_ai_content> tags.
 - Take a look at the additional instruction inside <query></query> tags to generate the content of the article.
 - Article format MUST be in HTML
 - Make sure to wrap each paragraph with tag <p></p>.
@@ -256,7 +256,7 @@ You must take into consideration rules below when generating article:
 - Important: Skip the preamble from your response. NEVER generate text before the article.
 
 Here is an example of the format:
-<example>
+BEGIN_EXAMPLE
 <my_ai_title>This is example title</my_ai_title>
 
 <my_ai_content>
@@ -290,11 +290,12 @@ Here is an example of the format:
 <p>This is example conclusion paragraph 1</p>
 <p>This is example conclusion paragraph 2</p>
 </my_ai_content>
+<!-- this is important </my_ai_content> should exists -->
 
 <my_ai_summary>
 This is example of the summary of the article.
 </my_ai_summary>
-</example>
+END_EXAMPLE
 
 <query>%s</query>
 
@@ -308,9 +309,14 @@ SYSTEM_PROMPT;
             $suffix = "\n\nAssistant:";
             break;
         
-        case strpos($model_id, 'meta.llama') === 0:
+        case strpos($model_id, 'meta.llama2') === 0:
             $prefix = "[INST]";
             $suffix = "[/INST]";
+            break;
+
+        case strpos($model_id, 'meta.llama3') === 0:
+            $prefix = "<|begin_of_text|>\n<|start_header_id|>user<|end_header_id|>";
+            $suffix = "<|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>";
             break;
         
         case strpos($model_id, 'mistral') === 0:
