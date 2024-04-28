@@ -115,7 +115,7 @@ function my_ai_build_bedrock_body($model_id, $params) {
             break;
 
         // Meta Llama2 parameters
-        case strpos($model_id, 'meta.llama2') === 0:
+        case strpos($model_id, 'meta.llama') === 0:
             $param_body = [
                 'prompt' => $params['prompt'],
                 'max_gen_len' => $params['max_tokens'] ? $params['max_tokens'] : 2048,
@@ -183,7 +183,7 @@ function my_ai_parse_bedrock_response($model_id, $response) {
             break;
 
         // Meta Llama2 response
-        case strpos($model_id, 'meta.llama2') === 0:
+        case strpos($model_id, 'meta.llama') === 0:
             $parsed_response = [
                 'error' => null,
                 'text' => $response['generation'] ?? ''
@@ -308,7 +308,7 @@ SYSTEM_PROMPT;
             $suffix = "\n\nAssistant:";
             break;
         
-        case strpos($model_id, 'meta.llama2') === 0:
+        case strpos($model_id, 'meta.llama') === 0:
             $prefix = "[INST]";
             $suffix = "[/INST]";
             break;
