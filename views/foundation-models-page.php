@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php if (isset($foundation_models['error'])) : ?>
     <p>No foundation models found. </p>
-    <p>Make sure your href="<?php echo esc_url($aws_credentials_link); ?>">AWS credentials</a> is correct and having proper permissions.</p>
+    <p>Make sure your <a href="<?php echo esc_url($aws_credentials_link); ?>">AWS credentials</a> is correct and having proper permissions.</p>
     <p><strong>Message</strong>:<br><i><?php echo esc_html($foundation_models['error']); ?></i></p>
 <?php return; endif; ?>
     <form method="post"><?php 
