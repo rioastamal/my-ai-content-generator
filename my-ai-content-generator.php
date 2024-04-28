@@ -233,3 +233,20 @@ function my_ai_settings_menu() {
 }
 
 require __DIR__ . '/my-ai-rest-api.php';
+add_action('enqueue_block_editor_assets', function() {
+    // Script dependencies
+    $dependencies = ['react', 'wp-blocks', 'wp-editor'];
+
+    // URL to js/my-ai-sidebar.js
+    $script_url = plugin_dir_url(__FILE__) . 'js/my-ai-sidebar.js';
+    
+    // Enqueue script and use version 1.0.0 as a cache buster
+    wp_enqueue_script('my-ai-sidebar', $script_url, $dependencies, '1.0.0', true);
+
+    // Get current selected foundation models from the database
+    $selected_foundation_models = get_option('my_ai_selected_foundation_models', []);
+
+    // Add inline script so wp-ai-sidebar.js can set the selected foundation models
+    $javascript_line = sprintf('var myAiSelectedFoundationModels = %s;', json_encode($selected_foundation_models));
+    wp_add_inline_script('my-ai-sidebar', $javascript_line, 'before');
+});
