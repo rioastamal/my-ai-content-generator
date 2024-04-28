@@ -106,7 +106,7 @@ function my_ai_build_bedrock_body($model_id, $params) {
                 'prompt' => $params['prompt'],
                 'max_tokens' => $params['max_tokens'] ? $params['max_tokens'] : 4000,
                 'temperature' => $params['temperature'] ? $params['temperature'] : 0.8,
-                'p' => $params['top_k'] ? $params['top_k'] : 0.9,
+                'p' => $params['top_p'] ? $params['top_p'] : 0.9,
                 'k' => $params['top_k'] ? $params['top_k'] : 200,
                 'stop_sequences' => [],
                 'return_likelihoods' => 'NONE',
@@ -249,7 +249,6 @@ You must take into consideration rules below when generating article:
 - Title MUST be put within <my_ai_title></my_ai_title> tags.
 - The article content MUST be put within <my_ai_content></my_ai_content> tags.
 - The summary of the content MUST be put within <my_ai_summary></my_ai_summary> tags. It must be put outside <my_ai_content></my_ai_content> tags.
-- Take a look at the additional instruction inside <query></query> tags to generate the content of the article.
 - Article format MUST be in HTML
 - Make sure to wrap each paragraph with tag <p></p>.
 - Make sure to wrap each heading with tag <h2></h2> or <h3></h3>. Depending on the heading level.
@@ -296,37 +295,45 @@ BEGIN_EXAMPLE
 This is example of the summary of the article.
 </my_ai_summary>
 END_EXAMPLE
-
-<query>%s</query>
-
 SYSTEM_PROMPT;
 
     // Add prefix or suffix to the prompt based on the value of model id
-    $prefix = ''; $suffix = '';
-    switch (true) {
-        case strpos($model_id, 'anthropic.claude-v2') === 0:
-            $prefix = "\n\nHuman:";
-            $suffix = "\n\nAssistant:";
-            break;
-        
-        case strpos($model_id, 'meta.llama2') === 0:
-            $prefix = "[INST]";
-            $suffix = "[/INST]";
-            break;
+    if (strpos($model_id, 'anthropic.claude-v2') === 0) {
+        $final_prompt = <<<FINAL_PROMPT
 
-        case strpos($model_id, 'meta.llama3') === 0:
-            $prefix = "<|begin_of_text|>\n<|start_header_id|>user<|end_header_id|>";
-            $suffix = "<|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>";
-            break;
-        
-        case strpos($model_id, 'mistral') === 0:
-            $prefix = "<s>[INST]";
-            $suffix = "[/INST]";
-            break;
+Human: $system_prompt
+$user_prompt
+
+Assistant: 
+FINAL_PROMPT;
     }
 
-    $final_prompt = $prefix . $system_prompt . $suffix;
-    return sprintf($final_prompt, $user_prompt);
+    if (strpos($model_id, 'meta.llama2') === 0) {
+        return <<<FINAL_PROMPT
+<s>[INST]<<SYS>>$system_prompt<</SYS>>
+$user_prompt 
+[/INST]
+FINAL_PROMPT;
+    }
+
+    if (strpos($model_id, 'meta.llama3') === 0) {
+        return <<<FINAL_PROMPT
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+$system_prompt<|eot_id|><|start_header_id|>user<|end_header_id|>
+$user_prompt<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+FINAL_PROMPT;
+    }
+
+    if (strpos($model_id, 'mistral') === 0) {
+        return <<<FINAL_PROMPT
+<s>[INST]$system_prompt
+
+$user_prompt
+[/INST]
+FINAL_PROMPT;
+    }
+
+    return $system_prompt . "\n\n" . $user_prompt;
 }
 
 /**
