@@ -250,7 +250,7 @@ add_action('enqueue_block_editor_assets', function() {
     // Get current selected foundation models from the database
     $selected_foundation_models = get_option('my_ai_selected_foundation_models', []);
 
-    // Add inline script so wp-ai-sidebar.js can set the selected foundation models
+    // Add inline script so my-ai-sidebar.js can set the selected foundation models
     $javascript_line = sprintf('var myAiSelectedFoundationModels = %s;', json_encode($selected_foundation_models));
     wp_add_inline_script('my-ai-sidebar', $javascript_line, 'before');
 });
